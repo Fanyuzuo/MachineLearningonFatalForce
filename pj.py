@@ -44,7 +44,7 @@ class nb_class:
         for t in true_text_copy:
             for word in t.split():
                 if word not in string.punctuation:
-                	if word not in cachedStopWords:                    
+                    if word not in cachedStopWords:
                         if word not in count:
                             count[word] = 1
                         else:
