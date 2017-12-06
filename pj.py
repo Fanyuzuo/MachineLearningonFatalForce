@@ -4,6 +4,10 @@ import random
 import copy
 import numpy as np
 from sklearn.metrics import f1_score
+import nltk
+#nltk.download()
+
+cachedStopWords = stopwords.words("english")
 # ture_txt = positive reviews, false_txt = negative reviews
 class nb_class:
     def data_prep(self, path_true_txt, path_false_txt):
@@ -40,10 +44,11 @@ class nb_class:
         for t in true_text_copy:
             for word in t.split():
                 if word not in string.punctuation:
-                    if word not in count:
-                        count[word] = 1
-                    else:
-                        count[word] += 1
+                	if word not in cachedStopWords:                    
+                        if word not in count:
+                            count[word] = 1
+                        else:
+                            count[word] += 1
         #filter out all the words with frequence less than 2
         # with open('stopwords.txt') as f:
         #     stopwords = f.readlines()
