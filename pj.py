@@ -5,6 +5,8 @@ import copy
 import numpy as np
 from sklearn.metrics import f1_score
 import nltk
+from nltk.corpus import stopwords
+
 #nltk.download()
 
 cachedStopWords = stopwords.words("english")
@@ -43,12 +45,12 @@ class nb_class:
         true_text_copy.extend(false_text)
         for t in true_text_copy:
             for word in t.split():
-                if word not in string.punctuation:
-                    if word not in cachedStopWords:
-                        if word not in count:
-                            count[word] = 1
-                        else:
-                            count[word] += 1
+            	if word not in string.punctuation:
+            		if word not in cachedStopWords:
+            			if word not in count:
+            				count[word] = 1
+            			else:
+            				count[word] += 1
         #filter out all the words with frequence less than 2
         # with open('stopwords.txt') as f:
         #     stopwords = f.readlines()
@@ -137,6 +139,7 @@ if __name__ == '__main__':
     #extraction of description data from csv file and split into mental==true to pos
     # mental == false to neg
     df = pd.read_csv('~/Desktop/shooting_data_with_county_covariates.csv', encoding='ISO-8859-1')
+    #df = pd.read_csv('shooting_data_with_county_covariates.csv', encoding='ISO-8859-1')
     df_text = df.ix[:,['description','mental']]
     df_pos = df_text[df_text['mental']== True]['description']
     df_neg = df_text[df_text['mental'] == False]['description']
