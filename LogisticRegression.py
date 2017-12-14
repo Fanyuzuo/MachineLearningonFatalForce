@@ -7,6 +7,7 @@ from distutils.version import LooseVersion as Version
 from sklearn import __version__ as sklearn_version
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
 
 porter = PorterStemmer()
 
@@ -84,3 +85,16 @@ print('CV Accuracy: %.3f' % gs_lr_tfidf.best_score_)
 
 clf = gs_lr_tfidf.best_estimator_
 print('Test Accuracy: %.3f' % clf.score(X_test, y_test))
+
+y_pred = gs_lr_tfidf.predict(X_test)
+print(y_pred)
+
+sr = recall_score(y_test, y_pred, average="macro")
+print(sr)
+
+sp =  precision_score(y_test, y_pred, average="macro")
+print(sp)
+
+sf = f1_score(y_test, y_pred, average="macro")
+print(sf)
+
