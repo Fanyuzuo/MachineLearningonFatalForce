@@ -5,6 +5,9 @@ import copy
 import numpy as np
 from sklearn.metrics import f1_score
 import nltk
+from nltk.corpus import stopwords
+from sklearn.model_selection import train_test_split
+
 # import ssl
 
 # try:
@@ -17,7 +20,7 @@ import nltk
 # nltk.download()
 
 
-cachedStopWords = stopwords.words("english")
+# cachedStopWords = stopwords.words("english")
 # ture_txt = positive reviews, false_txt = negative reviews
 class nb_class:
     def data_prep(self, path_true_txt, path_false_txt):
@@ -32,6 +35,7 @@ class nb_class:
         # shuffle datasets and split into train, dev, test
         SEED = 120
         random.seed(SEED)
+
         random.shuffle(true_text)
         random.shuffle(false_text)
         training_size = int(len(true_text)*0.7)
@@ -54,16 +58,16 @@ class nb_class:
         for t in true_text_copy:
             for word in t.split():
             	if word not in string.punctuation:
-            		if word not in cachedStopWords:
+            		# if word not in cachedStopWords:
             			if word not in count:
             				count[word] = 1
             			else:
             				count[word] += 1
-        #filter out all the words with frequence less than 2
+        # # filter out all the words with frequence less than 2
         # with open('stopwords.txt') as f:
         #     stopwords = f.readlines()
         # stopwords = [w.strip() for w in stopwords]
-        # stopwords = []
+        
         # d = dict((k, v) for k, v in count.items() if v > 1 and k not in stopwords)
         d = dict((k, v) for k, v in count.items() if v > 1)
         return d
@@ -128,6 +132,9 @@ class nb_class:
             else:
                 pred_label.append(0)
         return pred_label
+
+
+
         # calculate accuracy
     def getacc(self,true_pred_label,false_pred_label):
         total = len(true_pred_label)+len(false_pred_label)
@@ -141,29 +148,27 @@ class nb_class:
 
 
         return float(acc)/total
+
+
+
         # calculate percision
-    def getpre(self, true_pred_label, false_pred_label):
+    def getconf(self, true_pred_label, false_pred_label):
         total = 0
-        precision =0
-        for label in true_pred_label:
-            if label ==1:
-                precision+=1
-                total +=1
-        for label in false_pred_label:
-            if label ==1:
-                total +=1
-        return float(precision)/total
-        # calculate recall
-    def getrecall(self, true_pred_label, false_pred_label):
-        total = len(true_pred_label)
-        recall = 0
+        TP = 0
+        FP = 0
+        TN = 0
+        FN = 0
         for label in true_pred_label:
             if label == 1:
-                recall+=1
-        return float(recall)/total
-
-
-
+                TP += 1 
+            else:
+                FN += 1
+        for label in false_pred_label:
+            if label == 0:
+                TN += 1
+            else:
+                FP += 1 
+        return TP, TN, FP, FN
 
 
 if __name__ == '__main__':
@@ -184,12 +189,23 @@ if __name__ == '__main__':
     true_dic_prob,false_dic_prob,prior_prob = nb_class().count_prob(true_train,false_train,dictionary)
     pred_true_dev = nb_class().bayes(true_dic_prob,false_dic_prob,true_dev,dictionary,prior_prob)
     pred_false_dev = nb_class().bayes(true_dic_prob,false_dic_prob,false_dev,dictionary,prior_prob)
+    TP, TN, FP, FN = nb_class().getconf(pred_true_dev,pred_false_dev)
+
+    precision = float(TP)/(TP+FP)
+    recall = float(TP)/(TP+FN)
+    f1 = 2*precision*recall/(precision+recall)
     print ("The acc on the dev set is",nb_class().getacc(pred_true_dev,pred_false_dev))
-    print("The precision on the dev set is ", nb_class().getpre(pred_true_dev, pred_false_dev))
-    print("The recall on the dev set is ", nb_class().getrecall(pred_true_dev, pred_false_dev))
-    f1 = 2*nb_class().getpre(pred_true_dev, pred_false_dev)*nb_class().getrecall(pred_true_dev, pred_false_dev)/(nb_class().getpre(pred_true_dev, pred_false_dev)+nb_class().getrecall(pred_true_dev, pred_false_dev))
     print("The F1 score on the dev set is ", f1)
     # test on test set
+
+    pred_true_test = nb_class().bayes(true_dic_prob,false_dic_prob,true_test,dictionary,prior_prob)
+    pred_false_test = nb_class().bayes(true_dic_prob,false_dic_prob,false_test,dictionary,prior_prob)
+    TP, TN, FP, FN = nb_class().getconf(pred_true_test,pred_false_test)
+    precision = float(TP)/(TP+FP)
+    recall = float(TP)/(TP+FN)
+    f1 = 2*precision*recall/(precision+recall)
+    print ("The acc on the test set is",nb_class().getacc(pred_true_test,pred_false_test))
+    print("The F1 score on the dev test is ", f1)
 
 
 
