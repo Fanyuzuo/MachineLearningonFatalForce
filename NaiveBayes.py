@@ -5,9 +5,17 @@ import copy
 import numpy as np
 from sklearn.metrics import f1_score
 import nltk
-from nltk.corpus import stopwords
+# import ssl
 
-#nltk.download()
+# try:
+#     _create_unverified_https_context = ssl._create_unverified_context
+# except AttributeError:
+#     pass
+# else:
+#     ssl._create_default_https_context = _create_unverified_https_context
+
+# nltk.download()
+
 
 cachedStopWords = stopwords.words("english")
 # ture_txt = positive reviews, false_txt = negative reviews
@@ -120,6 +128,7 @@ class nb_class:
             else:
                 pred_label.append(0)
         return pred_label
+        # calculate accuracy
     def getacc(self,true_pred_label,false_pred_label):
         total = len(true_pred_label)+len(false_pred_label)
         acc = 0
@@ -132,6 +141,28 @@ class nb_class:
 
 
         return float(acc)/total
+        # calculate percision
+    def getpre(self, true_pred_label, false_pred_label):
+        total = 0
+        precision =0
+        for label in true_pred_label:
+            if label ==1:
+                precision+=1
+                total +=1
+        for label in false_pred_label:
+            if label ==1:
+                total +=1
+        return float(precision)/total
+        # calculate recall
+    def getrecall(self, true_pred_label, false_pred_label):
+        total = len(true_pred_label)
+        recall = 0
+        for label in true_pred_label:
+            if label == 1:
+                recall+=1
+        return float(recall)/total
+
+
 
 
 
@@ -154,6 +185,10 @@ if __name__ == '__main__':
     pred_true_dev = nb_class().bayes(true_dic_prob,false_dic_prob,true_dev,dictionary,prior_prob)
     pred_false_dev = nb_class().bayes(true_dic_prob,false_dic_prob,false_dev,dictionary,prior_prob)
     print ("The acc on the dev set is",nb_class().getacc(pred_true_dev,pred_false_dev))
+    print("The precision on the dev set is ", nb_class().getpre(pred_true_dev, pred_false_dev))
+    print("The recall on the dev set is ", nb_class().getrecall(pred_true_dev, pred_false_dev))
+    f1 = 2*nb_class().getpre(pred_true_dev, pred_false_dev)*nb_class().getrecall(pred_true_dev, pred_false_dev)/(nb_class().getpre(pred_true_dev, pred_false_dev)+nb_class().getrecall(pred_true_dev, pred_false_dev))
+    print("The F1 score on the dev set is ", f1)
     # test on test set
 
 
