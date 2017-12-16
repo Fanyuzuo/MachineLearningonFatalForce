@@ -31,12 +31,12 @@ def tokenizer(text):
 df = pd.read_csv('shooting_data_with_county_covariates.csv', encoding='ISO-8859-1')
 df_text = df.ix[:,['description','mental']]
 
-X_train = df_text.loc[:500, 'description'].values
-y_train = df_text.loc[:500, 'mental'].values
-X_dev = df_text.loc[500:, 'description'].values
-y_dev = df_text.loc[500:, 'mental'].values
-X_test = df_text.loc[500:, 'description'].values
-y_test = df_text.loc[500:, 'mental'].values
+X_train = df_text.loc[:2742, 'description'].values
+y_train = df_text.loc[:2742, 'mental'].values
+X_dev = df_text.loc[588:, 'description'].values
+y_dev = df_text.loc[588:, 'mental'].values
+X_test = df_text.loc[587:, 'description'].values
+y_test = df_text.loc[587:, 'mental'].values
 
 
 from sklearn.pipeline import Pipeline
@@ -76,7 +76,7 @@ gs_lr_tfidf = GridSearchCV(lr_tfidf, param_grid,
                            
                            
                            
-gs_lr_tfidf.fit(X_dev, y_dev)
+gs_lr_tfidf.fit(X_train, y_train)
 
 
 print('Best parameter set: %s ' % gs_lr_tfidf.best_params_)
